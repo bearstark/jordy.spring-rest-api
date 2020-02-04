@@ -1,18 +1,26 @@
 package me.jordy.rest.entity;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import me.jordy.rest.repository.EventRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.print.attribute.standard.Media;
 
+import java.time.LocalDateTime;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 
@@ -29,13 +37,45 @@ public class EventControllerTest {
     @Autowired
     MockMvc mockMvc;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
+    // 생성 사유
+    // 현재 테스트가 @WebMvcTest 로 실행 중.
+    // 그래서, EventRepository는 Bean 으로 등록 되지 않음.
+    // Mock으로 등록해서 빈이 존재 하지 않음 에러 해결.
+    // 하지만 여전히 Null을 반환.
+    @MockBean
+    EventRepository eventRepository;
+
     @Test
     public void createEvent() throws Exception {
+        Event event = Event.builder()
+                .id(10)
+                .name("Spring")
+                .description("Rest API Development Spring")
+                .beginEnrollmentDateTime(LocalDateTime.of(2020,1,1, 13,0))
+                .closeEnrollmentDateTime(LocalDateTime.of(2020,01,10,13,0))
+                .beginEventDateTime(LocalDateTime.of(2020,1,13,13,0))
+                .endEventDateTime(LocalDateTime.of(2020,1,13,15,0))
+                .basePrice(100)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("강남역 D2 스타트업 팩토리")
+                .build()
+                ;
+
+        Mockito.when(eventRepository.save(event)).thenReturn(event);
+
         mockMvc.perform(post("/api/events")
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
-                    .accept(MediaTypes.HAL_JSON))
-                .andExpect(status().isOk())
-
+                    .accept(MediaTypes.HAL_JSON)
+                    .content(objectMapper.writeValueAsString(event)))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(header().exists(HttpHeaders.LOCATION))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))
         ;
     }
 }
