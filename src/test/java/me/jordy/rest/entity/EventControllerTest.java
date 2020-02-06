@@ -64,8 +64,8 @@ public class EventControllerTest {
                     .accept(MediaTypes.HAL_JSON)
                     .content(objectMapper.writeValueAsString(event)))
                 .andDo(print())
-//                .andExpect(status().isCreated())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isCreated())
+//                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(header().exists(HttpHeaders.LOCATION))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))
@@ -77,11 +77,24 @@ public class EventControllerTest {
 
     @Test
     public void createEvent_Bad_Request_Empty_Input() throws Exception {
-        EventDto eventDto = EventDto.builder().build();
+        EventDto eventDto = EventDto.builder()
+                .name("Spring")
+                .description("Rest API Development Spring")
+                .beginEnrollmentDateTime(LocalDateTime.of(2020,2,1, 13,0))
+                .closeEnrollmentDateTime(LocalDateTime.of(2020,1,10,13,0))
+                .beginEventDateTime(LocalDateTime.of(2020,1,13,13,0))
+                .endEventDateTime(LocalDateTime.of(2020,1,13,15,0))
+                .basePrice(100)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("강남역 D2 스타트업 팩토리")
+                .build()
+        ;
 
         this.mockMvc.perform(post("/api/events")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(eventDto)))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 ;
     }
