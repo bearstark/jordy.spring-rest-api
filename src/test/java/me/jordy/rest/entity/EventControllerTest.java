@@ -69,6 +69,9 @@ public class EventControllerTest {
                 .andExpect(jsonPath("id").exists())
                 .andExpect(header().exists(HttpHeaders.LOCATION))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.query-events").exists())
+                .andExpect(jsonPath("_links.update-event").exists());
 
 //                .andExpect(jsonPath("id").value(Matchers.not(100)))
 //                .andExpect(jsonPath("free").value(Matchers.not(true)))
@@ -89,13 +92,41 @@ public class EventControllerTest {
                 .limitOfEnrollment(100)
                 .location("강남역 D2 스타트업 팩토리")
                 .build()
-        ;
+                ;
 
         this.mockMvc.perform(post("/api/events")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(eventDto)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
+        ;
+    }
+    @Test
+    public void createEvent_Bad_Request_Wrong_Input() throws Exception {
+        EventDto eventDto = EventDto.builder()
+                .name("Spring")
+                .description("Rest API Development Spring")
+                .beginEnrollmentDateTime(LocalDateTime.of(2020,2,1, 13,0))
+                .closeEnrollmentDateTime(LocalDateTime.of(2020,1,10,13,0))
+                .beginEventDateTime(LocalDateTime.of(2020,1,13,13,0))
+                .endEventDateTime(LocalDateTime.of(2020,1,13,15,0))
+                .basePrice(10000)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("강남역 D2 스타트업 팩토리")
+                .build()
                 ;
+
+        this.mockMvc.perform(post("/api/events")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(eventDto)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$[0].objectName").exists())
+                .andExpect(jsonPath("$[0].field").exists())
+                .andExpect(jsonPath("$[0].defaultMessage").exists())
+                .andExpect(jsonPath("$[0].code").exists())
+                .andExpect(jsonPath("$[0].rejectedValue").exists())
+        ;
     }
 }

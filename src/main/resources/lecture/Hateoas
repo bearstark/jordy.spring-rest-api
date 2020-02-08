@@ -1,0 +1,17 @@
+# 클래스 변화
+In case you are using HATEOAS v1.0 and above (Spring boot >= 2.2.0), do note that the classnames have changed. Notably the below classes have been renamed:
+
+ResourceSupport changed to RepresentationModel
+Resource changed to EntityModel
+Resources changed to CollectionModel
+PagedResources changed to PagedModel
+ResourceAssembler changed to RepresentationModelAssembler
+More information available in the official documentation here.
+
+When using Spring boot starter, the below dependency would suffice to include HATEOAS:
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-hateoas</artifactId>
+</dependency>
+Hoping this information will help someone like me who searched for hours to find why Resource class was not getting resolved.

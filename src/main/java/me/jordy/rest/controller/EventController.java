@@ -3,10 +3,14 @@ package me.jordy.rest.controller;
 import me.jordy.rest.entity.Event;
 import me.jordy.rest.entity.EventDto;
 import me.jordy.rest.repository.EventRepository;
+import me.jordy.rest.resource.EventEntityModel;
+import me.jordy.rest.resource.EventResource;
 import me.jordy.rest.validator.EventValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.server.mvc.ControllerLinkRelationProvider;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
@@ -41,13 +45,15 @@ public class EventController {
 
         System.out.println(errors.hasErrors());
         if(errors.hasErrors()) {
-            return ResponseEntity.badRequest().build();
+//            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(errors);
         }
 
         eventValidator.validate(eventDto,errors);
 
         if(errors.hasErrors()) {
-            return ResponseEntity.badRequest().build();
+//            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(errors);
         }
 
         Event event = modelMapper.map(eventDto, Event.class);
@@ -55,8 +61,15 @@ public class EventController {
         Event newEvent = eventRepository.save(event);
         System.out.println("newEvent = "+ newEvent);
 //        URI createdUri = linkTo(methodOn(EventController.class).createEvent(e)).slash("{id}").toUri();
-        URI createdUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
+        WebMvcLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
+        URI createdUri = selfLinkBuilder.toUri();
+        // ObjectMapper 가 Object를 JSON으로 변경할 시 BeanSerializer를 사용.
+        // 자바 빈 스펙을 준수한 객체를 제이슨으로 변환 가능.
+        EventEntityModel eventResource = new EventEntityModel(event);
 
-        return ResponseEntity.created(createdUri).body(event)/*.build()*/;
+        eventResource.add(linkTo(EventController.class).withRel("query-events")); //select
+        eventResource.add(selfLinkBuilder.withRel("update-event")); //self //update, method 할당은 불가
+
+    return ResponseEntity.created(createdUri).body(eventResource)/*.build()*/;
     }
 }

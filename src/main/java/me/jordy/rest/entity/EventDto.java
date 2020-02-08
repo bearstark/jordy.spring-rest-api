@@ -43,21 +43,4 @@ public class EventDto {
     @Min(0)
     private int limitOfEnrollment;
 
-    @AssertTrue(message="등록 시작 시간이 등록 종료 시간 보다 더 큽니다.")
-    public boolean beginEnrollmentIsLaterThanCloseEnrollment () {
-        System.out.println("#########   beginEnrollmentIsLaterThanCloseEnrollment  ######");
-        if(beginEnrollmentDateTime.compareTo(closeEnrollmentDateTime) <= 0)
-            return false;
-        else
-            return true;
-    }
-    @AssertTrue(message="이벤트 시작 시간이 이벤트 종료 시간 보다 더 큽니다.")
-    public boolean beginEventIsLaterThanEndEvent () {
-        System.out.println("#########   beginEventIsLaterThanEndEvent  ######");
-        if(beginEventDateTime.compareTo(endEventDateTime) <= 0)
-            return false;
-        else
-            return true;
-    }
-
 }
