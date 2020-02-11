@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 // @Data 어노태이션은 사용하지 않는데,
 // 그 이유는 모든 필드를 가지고 equals와 hashcode를 구현.
 @EqualsAndHashCode(of = "id")
-
+@ToString
 @Entity
 public class Event {
 
