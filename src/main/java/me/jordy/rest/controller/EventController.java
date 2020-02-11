@@ -3,11 +3,13 @@ package me.jordy.rest.controller;
 import me.jordy.rest.entity.Event;
 import me.jordy.rest.entity.EventDto;
 import me.jordy.rest.repository.EventRepository;
+import me.jordy.rest.resource.ErrorsResource;
 import me.jordy.rest.resource.EventEntityModel;
 import me.jordy.rest.resource.EventResource;
 import me.jordy.rest.validator.EventValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.server.mvc.ControllerLinkRelationProvider;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -31,13 +33,13 @@ public class EventController {
 
     private final EventRepository eventRepository;
     private final ModelMapper modelMapper;
-    private final EventValidator eventValidator;
+    private final EventValidator eventValidators;
 
     // 생성자로 생성시 빈으로 이미 등록되어 있으면 @Autowired를 붙일 필요가 없음.(Spring 4.4 이상 부터)
-    public EventController(EventRepository eventRepository, ModelMapper modelMapper, EventValidator eventValidator){
+    public EventController(EventRepository eventRepository, ModelMapper modelMapper, EventValidator eventValidators){
         this.eventRepository = eventRepository;
         this.modelMapper = modelMapper;
-        this.eventValidator = eventValidator;
+        this.eventValidators = eventValidators;
     }
 
     @PostMapping
@@ -46,14 +48,14 @@ public class EventController {
         System.out.println(errors.hasErrors());
         if(errors.hasErrors()) {
 //            return ResponseEntity.badRequest().build();
-            return ResponseEntity.badRequest().body(errors);
+            return badRequest(errors);
         }
 
-        eventValidator.validate(eventDto,errors);
+        eventValidators.validate(eventDto,errors);
 
         if(errors.hasErrors()) {
 //            return ResponseEntity.badRequest().build();
-            return ResponseEntity.badRequest().body(errors);
+            return badRequest(errors);
         }
 
         Event event = modelMapper.map(eventDto, Event.class);
@@ -69,7 +71,13 @@ public class EventController {
 
         eventResource.add(linkTo(EventController.class).withRel("query-events")); //select
         eventResource.add(selfLinkBuilder.withRel("update-event")); //self //update, method 할당은 불가
+        eventResource.add(new Link("/docs/index.html#resource-events-created").withRel("profile")); //profile
 
     return ResponseEntity.created(createdUri).body(eventResource)/*.build()*/;
+    }
+
+    // Ctrl + Alt + m -> refactor
+    private ResponseEntity<ErrorsResource> badRequest(Errors errors) {
+        return ResponseEntity.badRequest().body(new ErrorsResource(errors));
     }
 }

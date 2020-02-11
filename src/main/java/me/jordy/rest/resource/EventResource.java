@@ -7,6 +7,7 @@ import org.springframework.web.servlet.resource.ResourceTransformerSupport;
 
 public class EventResource extends RepresentationModel {
 
+    //Array는 unwrapped 되지 않음.
     @JsonUnwrapped
     private Event event;
     // JsonUnwrapped는 아래와 같이 데이터가 나올때 event 밖으로 나옴.
