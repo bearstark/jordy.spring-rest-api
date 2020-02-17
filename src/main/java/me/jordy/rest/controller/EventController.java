@@ -17,14 +17,13 @@ import org.springframework.hateoas.server.mvc.ControllerLinkRelationProvider;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -88,6 +87,47 @@ public class EventController {
         pagedmodel.add(new Link("/docs/index.html#resource-events-list").withRel("profile"));
 //        PagedModel pagedmodel = assembler.toModel(page, e->new EventResource(e));
         return ResponseEntity.ok(pagedmodel);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity getEvents(@PathVariable Integer id) {
+        Optional<Event> optionalEvent = this.eventRepository.findById(id);
+        if (!optionalEvent.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Event event = optionalEvent.get();
+        EventEntityModel eventResource= new EventEntityModel(event);
+        eventResource.add(new Link("/docs/index.html#resources-events-get").withRel("profile"));
+        return ResponseEntity.ok(eventResource);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity updateEvent(@PathVariable Integer id,
+                                      @RequestBody @Valid EventDto eventDto,
+                                      Errors errors) {
+        Optional<Event> eventOptional= this.eventRepository.findById(id);
+        if(!eventOptional.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if(errors.hasErrors()) {
+            return badRequest(errors);
+        }
+
+        this.eventValidators.validate(eventDto, errors);
+        if(errors.hasErrors()) {
+            return badRequest(errors);
+        }
+
+        Event existingEvent = eventOptional.get();
+        this.modelMapper.map(eventDto, existingEvent);
+        Event savedEvent = this.eventRepository.save(existingEvent);
+
+        EventEntityModel eventEntityModel = new EventEntityModel(savedEvent);
+        eventEntityModel.add(new Link("/docs/index.html#resources-events-update").withRel("profile"));
+
+        return ResponseEntity.ok(eventEntityModel);
     }
 
 
