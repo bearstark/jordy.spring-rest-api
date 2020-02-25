@@ -13,7 +13,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 public class ErrorsResource extends EntityModel<Errors> {
 
-    public ErrorsResource (Errors content, Link... links) {
+    public ErrorsResource(Errors content, Link... links) {
         super(content, links);
         add(linkTo(methodOn(IndexController.class).index()).withRel("index"));
     }

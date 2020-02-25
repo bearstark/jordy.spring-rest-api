@@ -12,8 +12,4 @@ public class BaekRestApiApplication {
         SpringApplication.run(BaekRestApiApplication.class, args);
     }
 
-    @Bean
-    public ModelMapper modelMapper() {
-        return new ModelMapper();
-    }
 }

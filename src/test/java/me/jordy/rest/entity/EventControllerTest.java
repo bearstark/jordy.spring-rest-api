@@ -45,23 +45,22 @@ public class EventControllerTest extends BaseControllerTest {
                 .id(100)
                 .name("Spring")
                 .description("Rest API Development Spring")
-                .beginEnrollmentDateTime(LocalDateTime.of(2020,1,1, 13,0))
-                .closeEnrollmentDateTime(LocalDateTime.of(2020,01,10,13,0))
-                .beginEventDateTime(LocalDateTime.of(2020,1,13,13,0))
-                .endEventDateTime(LocalDateTime.of(2020,1,13,15,0))
+                .beginEnrollmentDateTime(LocalDateTime.of(2020, 1, 1, 13, 0))
+                .closeEnrollmentDateTime(LocalDateTime.of(2020, 01, 10, 13, 0))
+                .beginEventDateTime(LocalDateTime.of(2020, 1, 13, 13, 0))
+                .endEventDateTime(LocalDateTime.of(2020, 1, 13, 15, 0))
                 .basePrice(100)
                 .maxPrice(200)
                 .limitOfEnrollment(100)
                 .location("강남역 D2 스타트업 팩토리")
                 .free(true)
                 .offline(true)
-                .build()
-                ;
+                .build();
 
         mockMvc.perform(post("/api/events")
-                    .contentType(MediaType.APPLICATION_JSON_UTF8)
-                    .accept(MediaTypes.HAL_JSON)
-                    .content(objectMapper.writeValueAsString(event)))
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .accept(MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(event)))
                 .andDo(print())
                 .andExpect(status().isCreated())
 //                .andExpect(status().isBadRequest())
@@ -137,16 +136,15 @@ public class EventControllerTest extends BaseControllerTest {
         EventDto eventDto = EventDto.builder()
                 .name("Spring")
                 .description("Rest API Development Spring")
-                .beginEnrollmentDateTime(LocalDateTime.of(2020,2,1, 13,0))
-                .closeEnrollmentDateTime(LocalDateTime.of(2020,1,10,13,0))
-                .beginEventDateTime(LocalDateTime.of(2020,1,13,13,0))
-                .endEventDateTime(LocalDateTime.of(2020,1,13,15,0))
+                .beginEnrollmentDateTime(LocalDateTime.of(2020, 2, 1, 13, 0))
+                .closeEnrollmentDateTime(LocalDateTime.of(2020, 1, 10, 13, 0))
+                .beginEventDateTime(LocalDateTime.of(2020, 1, 13, 13, 0))
+                .endEventDateTime(LocalDateTime.of(2020, 1, 13, 15, 0))
                 .basePrice(100)
                 .maxPrice(200)
                 .limitOfEnrollment(100)
                 .location("강남역 D2 스타트업 팩토리")
-                .build()
-                ;
+                .build();
 
         this.mockMvc.perform(post("/api/events")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -155,21 +153,21 @@ public class EventControllerTest extends BaseControllerTest {
                 .andExpect(status().isBadRequest())
         ;
     }
+
     @Test
     public void createEvent_Bad_Request_Wrong_Input() throws Exception {
         EventDto eventDto = EventDto.builder()
                 .name("Spring")
                 .description("Rest API Development Spring")
-                .beginEnrollmentDateTime(LocalDateTime.of(2020,2,1, 13,0))
-                .closeEnrollmentDateTime(LocalDateTime.of(2020,1,10,13,0))
-                .beginEventDateTime(LocalDateTime.of(2020,1,13,13,0))
-                .endEventDateTime(LocalDateTime.of(2020,1,13,15,0))
+                .beginEnrollmentDateTime(LocalDateTime.of(2020, 2, 1, 13, 0))
+                .closeEnrollmentDateTime(LocalDateTime.of(2020, 1, 10, 13, 0))
+                .beginEventDateTime(LocalDateTime.of(2020, 1, 13, 13, 0))
+                .endEventDateTime(LocalDateTime.of(2020, 1, 13, 15, 0))
                 .basePrice(10000)
                 .maxPrice(200)
                 .limitOfEnrollment(100)
                 .location("강남역 D2 스타트업 팩토리")
-                .build()
-                ;
+                .build();
 
         this.mockMvc.perform(post("/api/events")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -187,13 +185,13 @@ public class EventControllerTest extends BaseControllerTest {
 
     @Test
     public void queryEvents() throws Exception {
-        IntStream.range(0,30).forEach(this::generateEvent);
+        IntStream.range(0, 30).forEach(this::generateEvent);
 
         // When
         ResultActions perform = this.mockMvc.perform(get("/api/events")
-                    .param("page","1")
-                    .param("size","10")
-                    .param("sort","name,DESC"));
+                .param("page", "1")
+                .param("size", "10")
+                .param("sort", "name,DESC"));
 
         // Then
         perform.andDo(print())
@@ -244,11 +242,11 @@ public class EventControllerTest extends BaseControllerTest {
         eventDto.setName(changedEventName);
 
         // When & Then
-        this.mockMvc.perform(put("/api/events/{id}",event.getId())
+        this.mockMvc.perform(put("/api/events/{id}", event.getId())
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .content(this.objectMapper.writeValueAsString(eventDto))
 //                        .accept(MediaType.APPLICATION_JSON_UTF8)
-                )
+        )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("name").value(changedEventName))
@@ -264,11 +262,11 @@ public class EventControllerTest extends BaseControllerTest {
         EventDto eventDto = new EventDto();
 
         // When & Then
-        this.mockMvc.perform(put("/api/events/{id}",event.getId())
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(this.objectMapper.writeValueAsString(eventDto))
+        this.mockMvc.perform(put("/api/events/{id}", event.getId())
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(this.objectMapper.writeValueAsString(eventDto))
 //                .accept(MediaType.APPLICATION_JSON_UTF8)
-                )
+        )
                 .andDo(print())
                 .andExpect(status().isBadRequest())
         ;
@@ -283,11 +281,11 @@ public class EventControllerTest extends BaseControllerTest {
         eventDto.setMaxPrice(1000);
 
         // When & Then
-        this.mockMvc.perform(put("/api/events/{id}",event.getId())
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(this.objectMapper.writeValueAsString(eventDto))
+        this.mockMvc.perform(put("/api/events/{id}", event.getId())
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(this.objectMapper.writeValueAsString(eventDto))
 //                .accept(MediaType.APPLICATION_JSON_UTF8)
-                 )
+        )
                 .andDo(print())
                 .andExpect(status().isBadRequest())
         ;
@@ -301,10 +299,10 @@ public class EventControllerTest extends BaseControllerTest {
 
         // When & Then
         this.mockMvc.perform(put("/api/events/12315153")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(this.objectMapper.writeValueAsString(eventDto))
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(this.objectMapper.writeValueAsString(eventDto))
 //                .accept(MediaType.APPLICATION_JSON_UTF8)
-                )
+        )
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
@@ -314,18 +312,17 @@ public class EventControllerTest extends BaseControllerTest {
         Event event = Event.builder()
                 .name("스프링")
                 .description("Rest API Development Spring")
-                .beginEnrollmentDateTime(LocalDateTime.of(2020,1,1, 13,0))
-                .closeEnrollmentDateTime(LocalDateTime.of(2020,01,10,13,0))
-                .beginEventDateTime(LocalDateTime.of(2020,1,13,13,0))
-                .endEventDateTime(LocalDateTime.of(2020,1,13,15,0))
+                .beginEnrollmentDateTime(LocalDateTime.of(2020, 1, 1, 13, 0))
+                .closeEnrollmentDateTime(LocalDateTime.of(2020, 01, 10, 13, 0))
+                .beginEventDateTime(LocalDateTime.of(2020, 1, 13, 13, 0))
+                .endEventDateTime(LocalDateTime.of(2020, 1, 13, 15, 0))
                 .basePrice(100)
                 .maxPrice(200)
                 .limitOfEnrollment(100)
                 .location("강남역 D2 스타트업 팩토리")
                 .free(false)
                 .offline(true)
-                .build()
-                ;
+                .build();
         return this.eventRepository.save(event);
     }
 }

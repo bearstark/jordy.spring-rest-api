@@ -5,8 +5,11 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Builder @NoArgsConstructor @AllArgsConstructor
-@Getter @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 // 기선님의 경우 상호 참조를 방지하기 위해 id와 같은 고유 값만 사용.
 // 연관 관계 만드는 필드는 절대 X (스택 오버 플로우가 발생할 수 있음)
 
@@ -21,7 +24,8 @@ public class Event {
     @GeneratedValue
     private Integer id;
 
-    private String name; private String description;
+    private String name;
+    private String description;
     private LocalDateTime beginEnrollmentDateTime;
     private LocalDateTime closeEnrollmentDateTime;
     private LocalDateTime beginEventDateTime;

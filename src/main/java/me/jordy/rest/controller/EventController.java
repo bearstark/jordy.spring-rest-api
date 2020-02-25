@@ -38,7 +38,7 @@ public class EventController {
     private final EventValidator eventValidators;
 
     // 생성자로 생성시 빈으로 이미 등록되어 있으면 @Autowired를 붙일 필요가 없음.(Spring 4.4 이상 부터)
-    public EventController(EventRepository eventRepository, ModelMapper modelMapper, EventValidator eventValidators){
+    public EventController(EventRepository eventRepository, ModelMapper modelMapper, EventValidator eventValidators) {
         this.eventRepository = eventRepository;
         this.modelMapper = modelMapper;
         this.eventValidators = eventValidators;
@@ -48,22 +48,22 @@ public class EventController {
     public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
 
         System.out.println(errors.hasErrors());
-        if(errors.hasErrors()) {
+        if (errors.hasErrors()) {
 //            return ResponseEntity.badRequest().build();
             return badRequest(errors);
         }
 
-        eventValidators.validate(eventDto,errors);
+        eventValidators.validate(eventDto, errors);
 
-        if(errors.hasErrors()) {
+        if (errors.hasErrors()) {
 //            return ResponseEntity.badRequest().build();
             return badRequest(errors);
         }
 
         Event event = modelMapper.map(eventDto, Event.class);
-        System.out.println("event = "+ event);
+        System.out.println("event = " + event);
         Event newEvent = eventRepository.save(event);
-        System.out.println("newEvent = "+ newEvent);
+        System.out.println("newEvent = " + newEvent);
 //        URI createdUri = linkTo(methodOn(EventController.class).createEvent(e)).slash("{id}").toUri();
         WebMvcLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
         URI createdUri = selfLinkBuilder.toUri();
@@ -75,13 +75,13 @@ public class EventController {
         eventResource.add(selfLinkBuilder.withRel("update-event")); //self //update, method 할당은 불가
         eventResource.add(new Link("/docs/index.html#resource-events-created").withRel("profile")); //profile
 
-    return ResponseEntity.created(createdUri).body(eventResource)/*.build()*/;
+        return ResponseEntity.created(createdUri).body(eventResource)/*.build()*/;
     }
 
     @GetMapping
     public ResponseEntity queryEvents(Pageable pageable, PagedResourcesAssembler<Event> assembler) {
         Page<Event> page = this.eventRepository.findAll(pageable);
-        PagedModel<EntityModel<Event>> pagedmodel = assembler.toModel(page,  (Event e) -> {
+        PagedModel<EntityModel<Event>> pagedmodel = assembler.toModel(page, (Event e) -> {
             return new EventEntityModel(e);
         });
         pagedmodel.add(new Link("/docs/index.html#resource-events-list").withRel("profile"));
@@ -97,7 +97,7 @@ public class EventController {
         }
 
         Event event = optionalEvent.get();
-        EventEntityModel eventResource= new EventEntityModel(event);
+        EventEntityModel eventResource = new EventEntityModel(event);
         eventResource.add(new Link("/docs/index.html#resources-events-get").withRel("profile"));
         return ResponseEntity.ok(eventResource);
     }
@@ -106,17 +106,17 @@ public class EventController {
     public ResponseEntity updateEvent(@PathVariable Integer id,
                                       @RequestBody @Valid EventDto eventDto,
                                       Errors errors) {
-        Optional<Event> eventOptional= this.eventRepository.findById(id);
-        if(!eventOptional.isPresent()) {
+        Optional<Event> eventOptional = this.eventRepository.findById(id);
+        if (!eventOptional.isPresent()) {
             return ResponseEntity.notFound().build();
         }
 
-        if(errors.hasErrors()) {
+        if (errors.hasErrors()) {
             return badRequest(errors);
         }
 
         this.eventValidators.validate(eventDto, errors);
-        if(errors.hasErrors()) {
+        if (errors.hasErrors()) {
             return badRequest(errors);
         }
 

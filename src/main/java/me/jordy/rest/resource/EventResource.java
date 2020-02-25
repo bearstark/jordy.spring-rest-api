@@ -18,7 +18,7 @@ public class EventResource extends RepresentationModel {
     //                  "beginEnrollmentDateTime":"2020-01-01T13:00:00",
     //  ...
 
-    public EventResource (Event event) {
+    public EventResource(Event event) {
         this.event = event;
     }
 
